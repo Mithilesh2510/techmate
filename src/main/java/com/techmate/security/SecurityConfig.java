@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/tickets/*/comments").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
