@@ -20,6 +20,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public TicketResponse createTicket(TicketRequest request) {
         User user = getCurrentUser();
@@ -62,6 +63,13 @@ public class TicketService {
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
         ticket.setStatus(status);
         Ticket updated = ticketRepository.save(ticket);
+
+        emailService.sendTicketStatusUpdate(
+                updated.getCreatedBy().getEmail(),
+                updated.getTitle(),
+                updated.getStatus().name()
+        );
+
         return mapToResponse(updated);
     }
 
