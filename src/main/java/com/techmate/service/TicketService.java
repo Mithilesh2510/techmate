@@ -34,6 +34,13 @@ public class TicketService {
                 .build();
 
         Ticket saved = ticketRepository.save(ticket);
+
+        try {
+            emailService.sendTicketCreatedConfirmation(user.getEmail(), saved.getTitle());
+        } catch (Exception e) {
+            System.err.println("Email failed: " + e.getMessage());
+        }
+
         return mapToResponse(saved);
     }
 
@@ -64,11 +71,15 @@ public class TicketService {
         ticket.setStatus(status);
         Ticket updated = ticketRepository.save(ticket);
 
-        emailService.sendTicketStatusUpdate(
-                updated.getCreatedBy().getEmail(),
-                updated.getTitle(),
-                updated.getStatus().name()
-        );
+        try {
+            emailService.sendTicketStatusUpdate(
+                    ticket.getCreatedBy().getEmail(),
+                    ticket.getTitle(),
+                    status.name()
+            );
+        } catch (Exception e) {
+            System.err.println("Email failed: " + e.getMessage());
+        }
 
         return mapToResponse(updated);
     }
